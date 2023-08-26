@@ -61,3 +61,12 @@ func get_from_list(key string, index int, ctx context.Context, client *redis.Cli
     fmt.Printf("Value at index %d: %+v\n", index, event)
 	return event
 }
+
+
+// TODOS
+
+
+// to do regist client
+// get client hearbeat
+// poll and deliver
+// handle failures
