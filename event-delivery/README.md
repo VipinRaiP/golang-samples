@@ -1,6 +1,7 @@
 Ingestion server
 
 $ go run ingestion.go
+
 curl --location --request GET 'http://localhost:8080/ingest' \
 --header 'Content-Type: application/json' \
 --data '{
