@@ -14,6 +14,6 @@ $ go run delivery-server.go
 
 Delivery client
 
-$ go run delivery-client.go <clientId>
+$ go run delivery-client.go clientId
 
 
