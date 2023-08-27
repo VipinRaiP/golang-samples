@@ -36,7 +36,7 @@ func HelloHandler(client *redis.Client, ctx context.Context) http.HandlerFunc{
 			return
 		}
 
-		result, err := client.LPush(ctx, key, jsonBytes).Result()
+		result, err := client.RPush(ctx, key, jsonBytes).Result()
 		if err != nil {
 			fmt.Println("Failed to push JSON to Redis:", err)
 			return
@@ -49,17 +49,15 @@ func HelloHandler(client *redis.Client, ctx context.Context) http.HandlerFunc{
 }
 
 func main() {
-	
-
 	ctx := context.Background()
 	client := redis.NewClient(&redis.Options{
 		Addr: "localhost:6379", // Replace with your Redis server's address
 		Password: "",          // No password by default
 		DB: 0,                 // Default DB
 	})
+	defer client.Close()
 
 	http.HandleFunc("/ingest", HelloHandler(client,ctx))
 
     http.ListenAndServe(":8080", nil)
-	client.close()
 }
