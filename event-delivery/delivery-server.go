@@ -36,13 +36,38 @@ func handleConnection(conn net.Conn, ctx context.Context, client *redis.Client) 
 			event := get_next_event(client_id,ctx,client)
 			// Send a response back to the client
 			response,_ := json.Marshal(event)
+			is_delivered := false
 			_, err = conn.Write(response)
 			if err != nil {
-				fmt.Println("Error writing:", err)
-				return
+				fmt.Printf("Error writing to clientId : %s , err : %v\n", client_id, err)
 				// add retry with backoff
+				backoff := 1
+				for i:= 0;i<3;i++ {
+					fmt.Printf("Retrying writing to clientId : %s , after  : %v seconds\n", client_id, backoff)
+					//sleep_duration := backoff*time.Second
+					time.Sleep(2*time.Second)
+					_, err = conn.Write(response)
+					if err!=nil{
+						fmt.Printf("Error writing to clientId : %s , err : %v\n", client_id, err)
+						backoff = backoff+3
+						if i==2{
+							fmt.Printf("Retry attempts exceeded to clientId : %s\n",client_id)
+						}
+					} else {
+						fmt.Printf("Retry attempts success to clientId : %s\n",client_id)
+						is_delivered = true
+						break
+					}
+				}
+			} else{
+				is_delivered = true
 			}
-			commit_offset(client_id,ctx,client)
+			if is_delivered{
+				commit_offset(client_id,ctx,client)
+			} else{
+				fmt.Println("Closing connection for clientId : ",client_id)
+				break
+			}
 		}
 		time.Sleep(2*time.Second)
 	}

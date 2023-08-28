@@ -18,3 +18,11 @@ Delivery client
 $ go run delivery-client.go clientId
 
 
+TODOS
+
+1. Add ack from client side
+
+2. Locks for event list
+
+3. Handling multiple connections of same client
+
