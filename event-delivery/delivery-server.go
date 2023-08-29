@@ -54,7 +54,7 @@ func handleConnection(conn net.Conn, ctx context.Context, client *redis.Client) 
 							fmt.Printf("Retry attempts exceeded to clientId : %s\n",client_id)
 						}
 					} else {
-						fmt.Printf("Retry attempts success to clientId : %s\n",client_id)
+						fmt.Printf("Retry attempt success to clientId : %s\n",client_id)
 						is_delivered = true
 						break
 					}
@@ -63,7 +63,17 @@ func handleConnection(conn net.Conn, ctx context.Context, client *redis.Client) 
 				is_delivered = true
 			}
 			if is_delivered{
-				commit_offset(client_id,ctx,client)
+				buffer = make([]byte,1024)
+				n,err := conn.Read(buffer)
+				if err!=nil{
+					fmt.Printf("Failed to receive ack from  clientId : %s\n",client_id)
+				} else {
+					ack := string(buffer[:n])
+					if ack=="ack"{
+						fmt.Println("Ack received from clientId : ",client_id)
+						commit_offset(client_id,ctx,client)
+					}
+				}
 			} else{
 				fmt.Println("Closing connection for clientId : ",client_id)
 				break

@@ -32,6 +32,13 @@ func main() {
 		}
 		response := buffer[:n]
 		fmt.Printf("Server response: %s\n", response)
+		ack := []byte("ack") 
+		_, err = conn.Write(ack)
+		if err != nil {
+			fmt.Println("Error sending ack:", err)
+			return
+		}
+		fmt.Println("Ack sent")
 		//time.Sleep(2)
 	}
 }
